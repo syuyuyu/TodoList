@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 import clsx from 'clsx';
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 
 import {
   CheckActiveIcon,
@@ -105,6 +105,7 @@ const StyledTaskItem = styled.div`
 
 const TodoItem = ({ todo, onSave, onDelete, onToggleDone, onChangeMode }) => {
   const inputRef = useRef(null);
+  // const [editInputValue, setEditInputValue] = useState(todo.inputValue);
 
   const handleKeyDown = (e) => {
     if (inputRef.current.value.length > 0 && e.key === 'Enter') {
@@ -134,6 +135,9 @@ const TodoItem = ({ todo, onSave, onDelete, onToggleDone, onChangeMode }) => {
         <span className="task-item-body-text">{todo.title}</span>
         <input
           ref={inputRef}
+          // key
+          // 解決按esc後回到編輯模式時的defaultValue會是上次放棄編輯的內容
+          key={Math.random() * 100}
           className="task-item-body-input"
           defaultValue={todo.title}
           onKeyDown={handleKeyDown}

@@ -2,59 +2,63 @@ import { Footer, Header, TodoCollection, TodoInput } from 'components';
 // import { router } from 'json-server';
 import { useState, useEffect } from 'react';
 import { getTodos, createTodo, patchTodo, deleteTodo } from 'api/todos.js';
-import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from 'contexts/AuthContext';
 
 const TodoPage = () => {
   const [inputValue, setInputValue] = useState('');
   const [todos, setTodos] = useState([]);
+  const navigate = useNavigate();
+  const { isAuthenticated, currentMember } = useAuth();
 
-  // 取得todos
-  const getTodosAsync = async () => {
-    try {
-      const todos = await getTodos();
-      console.log(todos);
-      setTodos(
-        todos.map((todo) => ({
-          ...todo,
-          isEdit: false,
-        })),
-      );
-    } catch (err) {
-      console.error(err);
-    }
-  };
+  // 串接api取得todos
+  // const getTodosAsync = async () => {
+  //   try {
+  //     const todos = await getTodos();
+  //     setTodos(
+  //       todos.map((todo) => ({
+  //         ...todo,
+  //         isEdit: false,
+  //       })),
+  //     );
+  //   } catch (err) {
+  //     console.error(err);
+  //   }
+  // };
 
   const handleChangeInput = (value) => {
     setInputValue(value);
   };
 
+  // 新增todo
   const handleAddTodo = async () => {
     if (inputValue.length === 0) {
       return;
     }
     try {
-      await createTodo({
+      const data = await createTodo({
         title: inputValue,
         isDone: false,
       });
-      getTodosAsync();
-      // setTodos((prevTodos) => {
-      //   return [
-      //     ...prevTodos,
-      //     {
-      //       title: data.title,
-      //       isDone: data.isDone,
-      //       id: data.id,
-      //       isEdit: false,
-      //     },
-      //   ];
-      // });
+      // getTodosAsync();
+      setTodos((prevTodos) => {
+        return [
+          ...prevTodos,
+          {
+            title: data.title,
+            isDone: data.isDone,
+            id: data.id,
+            isEdit: false,
+          },
+        ];
+      });
       setInputValue('');
     } catch (err) {
       console.error(err);
     }
   };
 
+  // 按下enter新增todo
   const handleKeyDown = () => {
     if (inputValue.length === 0) {
       return;
@@ -80,18 +84,18 @@ const TodoPage = () => {
         id,
         isDone: !currentTodo.isDone,
       });
-      getTodosAsync();
-      // setTodos((prevTodos) => {
-      //   return prevTodos.map((todo) => {
-      //     if (todo.id === id) {
-      //       return {
-      //         ...todo,
-      //         isDone: !todo.isDone,
-      //       };
-      //     }
-      //     return todo;
-      //   });
-      // });
+      // getTodosAsync();
+      setTodos((prevTodos) => {
+        return prevTodos.map((todo) => {
+          if (todo.id === id) {
+            return {
+              ...todo,
+              isDone: !todo.isDone,
+            };
+          }
+          return todo;
+        });
+      });
     } catch (err) {
       console.error(err);
     }
@@ -121,44 +125,64 @@ const TodoPage = () => {
         id,
         title,
       });
-      getTodosAsync();
-      // setTodos((prevTodos) => {
-      //   return prevTodos.map((todo) => {
-      //     if (todo.id === id) {
-      //       return {
-      //         ...todo,
-      //         title,
-      //         isEdit: false,
-      //       };
-      //     }
-      //     return todo;
-      //   });
-      // });
+      // getTodosAsync();
+      setTodos((prevTodos) => {
+        return prevTodos.map((todo) => {
+          if (todo.id === id) {
+            return {
+              ...todo,
+              title,
+              isEdit: false,
+            };
+          }
+          return todo;
+        });
+      });
     } catch (err) {
       console.error(err);
     }
   };
 
   const handleDelete = async (id) => {
-    // const newTodos = todos.filter((todo) => todo.id !== id);
+    const newTodos = todos.filter((todo) => todo.id !== id);
     try {
       await deleteTodo(id);
-      getTodosAsync();
-      // setTodos(newTodos);
+      // getTodosAsync();
+      setTodos(newTodos);
     } catch (err) {
       console.error('delete err ', err);
     }
   };
 
-  // 將todos放入setTodos裡
+  // 將todos放入setTodos裡，使用空[]，只在開始執行一次
   useEffect(() => {
+    // getTodosAsync();
+    const getTodosAsync = async () => {
+      try {
+        const todos = await getTodos();
+        setTodos(
+          todos.map((todo) => ({
+            ...todo,
+            isEdit: false,
+          })),
+        );
+      } catch (err) {
+        console.error(err);
+      }
+    };
     getTodosAsync();
   }, []);
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      navigate('/login');
+    }
+  }, [navigate, isAuthenticated]);
 
   return (
     <div>
       TodoPage
-      <Header />
+      <Header username={currentMember?.name} />
       <TodoInput
         inputValue={inputValue}
         onChange={handleChangeInput}
