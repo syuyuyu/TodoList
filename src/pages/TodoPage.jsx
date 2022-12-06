@@ -11,7 +11,7 @@ const TodoPage = () => {
   const navigate = useNavigate();
   const { isAuthenticated, currentMember } = useAuth();
 
-  // 串接api取得todos
+  // 將串接api取得todos拉到外面獨立
   // const getTodosAsync = async () => {
   //   try {
   //     const todos = await getTodos();
