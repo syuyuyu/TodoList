@@ -54,26 +54,36 @@ const TodoPage = () => {
       });
       setInputValue('');
     } catch (err) {
-      console.error(err);
+      console.error('handleaddtodo err :', err);
     }
   };
 
   // 按下enter新增todo
-  const handleKeyDown = () => {
+  const handleKeyDown = async () => {
     if (inputValue.length === 0) {
       return;
     }
-    setTodos((prevTodos) => {
-      return [
-        ...prevTodos,
-        {
-          title: inputValue,
-          isDone: false,
-          id: Math.random() * 100,
-        },
-      ];
-    });
-    setInputValue('');
+    try {
+      const data = await createTodo({
+        title: inputValue,
+        isDone: false,
+      });
+      // getTodosAsync();
+      setTodos((prevTodos) => {
+        return [
+          ...prevTodos,
+          {
+            title: data.title,
+            isDone: data.isDone,
+            id: data.id,
+            isEdit: false,
+          },
+        ];
+      });
+      setInputValue('');
+    } catch (err) {
+      console.error('keydown err:', err);
+    }
   };
 
   const handleToggleDone = async (id) => {
@@ -97,7 +107,7 @@ const TodoPage = () => {
         });
       });
     } catch (err) {
-      console.error(err);
+      console.error('hendletoggleDome err:', err);
     }
   };
 
@@ -139,7 +149,7 @@ const TodoPage = () => {
         });
       });
     } catch (err) {
-      console.error(err);
+      console.error('save err: ', err);
     }
   };
 
@@ -167,7 +177,7 @@ const TodoPage = () => {
           })),
         );
       } catch (err) {
-        console.error(err);
+        console.log('usrEffect error:', err);
       }
     };
     getTodosAsync();

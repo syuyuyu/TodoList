@@ -43,7 +43,7 @@ export const createTodo = async (payload) => {
       title,
       isDone,
     });
-    return res.data.data;
+    return res.data;
   } catch (err) {
     console.error('[Create Todo failed]:', err);
   }
@@ -56,7 +56,7 @@ export const patchTodo = async (payload) => {
       title,
       isDone,
     });
-    return res.data.data;
+    return res.data;
   } catch (err) {
     console.error('[Patch Todo failed]:', err);
   }
@@ -65,7 +65,7 @@ export const patchTodo = async (payload) => {
 export const deleteTodo = async (id) => {
   try {
     const res = await axiosInstance.delete(`${baseUrl}/todos/${id}`);
-    return res.data.data;
+    return res.data;
   } catch (err) {
     console.error('[Delete Todo failed]', err);
   }
