@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 import clsx from 'clsx';
-import { useRef, useState } from 'react';
+import { useRef } from 'react';
 
 import {
   CheckActiveIcon,
